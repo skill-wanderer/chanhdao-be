@@ -18,6 +18,9 @@ async function bootstrap() {
     }),
   );
 
+  // Global prefix
+  app.setGlobalPrefix('api');
+
   // CORS
   app.enableCors();
 
