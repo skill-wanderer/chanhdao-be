@@ -5,8 +5,6 @@ import { QuizScore } from './entities/quiz-score.entity';
 import { SubmitQuizScoreDto } from './dto/submit-quiz-score.dto';
 import { QuizScoreResponseDto, QuizScoreNotFoundResponseDto } from './dto/quiz-score-response.dto';
 
-const PASS_THRESHOLD = 70;
-
 @Injectable()
 export class QuizScoresService {
   private readonly logger = new Logger(QuizScoresService.name);
@@ -33,7 +31,7 @@ export class QuizScoresService {
       );
     }
 
-    const passed = dto.scorePercentage >= PASS_THRESHOLD;
+    const passed = dto.scorePercentage >= dto.passPercentage;
 
     const existing = await this.quizScoreRepo.findOne({
       where: { userId, courseSlug, lessonSlug },
@@ -43,7 +41,9 @@ export class QuizScoresService {
       existing.score = dto.score;
       existing.totalQuestions = dto.totalQuestions;
       existing.scorePercentage = dto.scorePercentage;
+      existing.passPercentage = dto.passPercentage;
       existing.passed = passed;
+      existing.answers = dto.answers ?? null;
 
       const saved = await this.quizScoreRepo.save(existing);
       this.logger.log(
@@ -59,6 +59,7 @@ export class QuizScoresService {
           scorePercentage: saved.scorePercentage,
           passed: saved.passed,
           submittedAt: saved.updatedAt,
+          answers: saved.answers,
         },
         alreadyExisted: true,
       };
@@ -71,7 +72,9 @@ export class QuizScoresService {
       score: dto.score,
       totalQuestions: dto.totalQuestions,
       scorePercentage: dto.scorePercentage,
+      passPercentage: dto.passPercentage,
       passed,
+      answers: dto.answers ?? null,
     });
 
     const saved = await this.quizScoreRepo.save(quizScore);
@@ -88,6 +91,7 @@ export class QuizScoresService {
         scorePercentage: saved.scorePercentage,
         passed: saved.passed,
         submittedAt: saved.submittedAt,
+        answers: saved.answers,
       },
       alreadyExisted: false,
     };
@@ -120,6 +124,7 @@ export class QuizScoresService {
       scorePercentage: existing.scorePercentage,
       passed: existing.passed,
       submittedAt: existing.submittedAt,
+      answers: existing.answers,
     };
   }
 }

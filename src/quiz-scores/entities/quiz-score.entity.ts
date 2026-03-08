@@ -31,8 +31,14 @@ export class QuizScore {
   @Column({ name: 'score_percentage' })
   scorePercentage: number;
 
+  @Column({ name: 'pass_percentage' })
+  passPercentage: number;
+
   @Column()
   passed: boolean;
+
+  @Column({ type: 'jsonb', nullable: true })
+  answers: Record<string, string> | null;
 
   @CreateDateColumn({ name: 'submitted_at' })
   submittedAt: Date;

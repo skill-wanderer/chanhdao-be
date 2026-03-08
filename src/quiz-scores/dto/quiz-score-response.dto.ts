@@ -21,6 +21,14 @@ export class QuizScoreResponseDto {
 
   @ApiProperty({ example: '2026-03-08T14:30:00.000Z' })
   submittedAt: Date;
+
+  @ApiProperty({
+    example: { '0': 'A', '1': 'B', '2': 'C', '3': 'A', '4': 'D' },
+    description: 'Map of question index to selected option key',
+    required: false,
+    nullable: true,
+  })
+  answers?: Record<string, string> | null;
 }
 
 export class QuizScoreNotFoundResponseDto {

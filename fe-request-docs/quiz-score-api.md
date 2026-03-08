@@ -40,15 +40,25 @@ Submits the authenticated user's quiz score for a specific lesson. If a score al
 {
   "score": 4,
   "totalQuestions": 5,
-  "scorePercentage": 80
+  "scorePercentage": 80,
+  "passPercentage": 50,
+  "answers": {
+    "0": "A",
+    "1": "B",
+    "2": "C",
+    "3": "A",
+    "4": "D"
+  }
 }
 ```
 
-| Field             | Type    | Required | Description                                       |
-|-------------------|---------|----------|---------------------------------------------------|
-| `score`           | integer | yes      | Number of correct answers                         |
-| `totalQuestions`   | integer | yes      | Total number of questions in the quiz             |
-| `scorePercentage` | integer | yes      | Calculated percentage (0–100), rounded to nearest |
+| Field             | Type    | Required | Description                                                    |
+|-------------------|---------|----------|----------------------------------------------------------------|
+| `score`           | integer | yes      | Number of correct answers                                      |
+| `totalQuestions`   | integer | yes      | Total number of questions in the quiz                          |
+| `scorePercentage` | integer | yes      | Calculated percentage (0–100), rounded to nearest               |
+| `passPercentage`  | integer | yes      | Threshold for passing (0–100), e.g. 50 or 70                   |
+| `answers`         | object  | no       | Map of question index (string) to selected option key (string) |
 
 ### Responses
 
@@ -62,7 +72,14 @@ Submits the authenticated user's quiz score for a specific lesson. If a score al
   "totalQuestions": 5,
   "scorePercentage": 80,
   "passed": true,
-  "submittedAt": "2026-03-08T14:30:00.000Z"
+  "submittedAt": "2026-03-08T14:30:00.000Z",
+  "answers": {
+    "0": "A",
+    "1": "B",
+    "2": "C",
+    "3": "A",
+    "4": "D"
+  }
 }
 ```
 
@@ -76,11 +93,18 @@ Submits the authenticated user's quiz score for a specific lesson. If a score al
   "totalQuestions": 5,
   "scorePercentage": 100,
   "passed": true,
-  "submittedAt": "2026-03-08T15:00:00.000Z"
+  "submittedAt": "2026-03-08T15:00:00.000Z",
+  "answers": {
+    "0": "A",
+    "1": "B",
+    "2": "C",
+    "3": "A",
+    "4": "D"
+  }
 }
 ```
 
-**`400 Bad Request`** — Invalid request body (e.g., missing fields, score > totalQuestions, negative values):
+**`400 Bad Request`** — Validation errors:
 
 ```json
 {
@@ -89,9 +113,14 @@ Submits the authenticated user's quiz score for a specific lesson. If a score al
 }
 ```
 
-**`401 Unauthorized`** — Missing or invalid access token.
+```json
+{
+  "statusCode": 400,
+  "message": "scorePercentage must match computed value (expected 80)"
+}
+```
 
-**`404 Not Found`** — Course or lesson slug does not exist, or lesson has no quiz.
+**`401 Unauthorized`** — Missing or invalid access token.
 
 ---
 
@@ -140,14 +169,11 @@ Returns the authenticated user's latest quiz score for a specific lesson.
 
 **`401 Unauthorized`** — Missing or invalid access token.
 
-**`404 Not Found`** — Course or lesson slug does not exist, or lesson has no quiz.
-
 ---
 
 ## Notes
 
-- **Pass threshold**: A score is considered passing when `scorePercentage >= 70`. The `passed` boolean in the response is derived from this rule on the BE side.
+- **Pass threshold**: `scorePercentage >= passPercentage` → `passed: true`. The FE sends the `passPercentage` per quiz (e.g. 50 for Module 1). The BE uses this to compute the `passed` flag.
 - **Idempotent update**: Re-submitting overwrites the previous score. Only the latest attempt is stored.
-- **Validation**: The BE should verify that `score <= totalQuestions`, both values are non-negative integers, and `scorePercentage` matches the computed value (`Math.round((score / totalQuestions) * 100)`).
-- **Quiz existence**: The BE should return `404` if the referenced lesson does not have a quiz attached.
-- **Frontend context**: The FE calls `POST` from the `QuizSection.vue` component after the user clicks "Submit Score". The `courseSlug` and `lessonSlug` come from the route params (`/courses/{courseSlug}/lessons/{lessonSlug}`).
+- **Validation**: The BE verifies that `score <= totalQuestions`, both values are non-negative integers, and `scorePercentage` matches `Math.round((score / totalQuestions) * 100)`.
+- **Response field**: `submittedAt` reflects the original submission time for first-time scores, and the update time for re-submissions.
