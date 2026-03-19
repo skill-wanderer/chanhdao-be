@@ -1,6 +1,8 @@
-# LMS-BE
+# chanhdao-be
 
-A Learning Management System backend built with **NestJS**, **TypeORM**, **PostgreSQL**, and **Keycloak** for authentication.
+Backend API for **[chanhdao.vn](https://chanhdao.vn)** — a platform for learning Buddhism with AI technology support.
+
+Built with **NestJS**, **TypeORM**, **PostgreSQL**, and **Keycloak** for authentication.
 
 ## Tech Stack
 
@@ -17,7 +19,7 @@ A Learning Management System backend built with **NestJS**, **TypeORM**, **Postg
 - **Keycloak Authentication** — Global JWT guard with `@Public()` decorator to opt out individual routes
 - **Role-Based Access Control** — `@Roles()` decorator backed by a global `RolesGuard` (supports realm and client roles)
 - **Lesson Completion Tracking** — Mark/unmark lessons as complete and query per-lesson or per-course progress
-- **Course Progress** — Aggregated progress percentage across all lessons in a course
+- **Quiz Score Management** — Submit and retrieve quiz scores per lesson
 - **Swagger UI** — Interactive API documentation with Bearer token support
 
 ## Project Structure
@@ -25,15 +27,10 @@ A Learning Management System backend built with **NestJS**, **TypeORM**, **Postg
 ```
 src/
 ├── auth/               # Authentication module (Keycloak strategy, guards, decorators)
-├── categories/         # Categories (entities, DTOs)
-├── common/             # Shared DTOs, entities, interfaces
 ├── config/             # App configuration (Keycloak config)
-├── courses/            # Course entity
 ├── database/           # TypeORM / PostgreSQL connection
-├── enrollments/        # Enrollment entities & DTOs
-├── lessons/            # Lesson entity
-├── progress/           # Lesson completion & course progress tracking
-├── users/              # User entities & DTOs
+├── progress/           # Lesson completion tracking
+├── quiz-scores/        # Quiz score submission and retrieval
 ├── app.module.ts       # Root module
 └── main.ts             # Application entry point
 ```
@@ -49,8 +46,8 @@ src/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/skill-wanderer/LMS-BE.git
-cd LMS-BE
+git clone https://github.com/JimmyYouhei/chanhdao-be.git
+cd chanhdao-be
 ```
 
 ### 2. Install dependencies
@@ -69,15 +66,15 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
-DB_NAME=lms
+DB_NAME=chanhdao
 
 # Keycloak
 KEYCLOAK_BASE_URL=http://localhost:8080
-KEYCLOAK_REALM=lms
-KEYCLOAK_CLIENT_ID=lms-backend
+KEYCLOAK_REALM=chanhdao
+KEYCLOAK_CLIENT_ID=chanhdao-backend
 # Optional explicit OIDC endpoints (recommended in production)
-# KEYCLOAK_ISSUER_URL=http://localhost:8080/realms/lms
-# KEYCLOAK_JWKS_URI=http://localhost:8080/realms/lms/protocol/openid-connect/certs
+# KEYCLOAK_ISSUER_URL=http://localhost:8080/realms/chanhdao
+# KEYCLOAK_JWKS_URI=http://localhost:8080/realms/chanhdao/protocol/openid-connect/certs
 
 # Application
 PORT=3000
@@ -102,28 +99,35 @@ The server starts at `http://localhost:3000` and Swagger docs are available at `
 
 ```bash
 # Build image
-docker build -t lms-be .
+docker build -t chanhdao-be .
 
 # Run container
-docker run -p 3000:3000 --env-file .env lms-be
+docker run -p 3000:3000 --env-file .env chanhdao-be
 ```
 
 ## API Endpoints
 
 ### Auth
 
-| Method | Path            | Description                        |
-|--------|-----------------|------------------------------------|
-| `GET`  | `/auth/profile` | Get current user profile from token |
+| Method | Path            | Description                          |
+|--------|-----------------|--------------------------------------|
+| `GET`  | `/auth/profile` | Get current user profile from token  |
 
 ### Progress
 
 | Method   | Path                                                     | Description                  |
 |----------|----------------------------------------------------------|------------------------------|
 | `POST`   | `/courses/{courseSlug}/lessons/{lessonSlug}/complete`    | Mark lesson as complete      |
-| `DELETE`  | `/courses/{courseSlug}/lessons/{lessonSlug}/complete`    | Unmark lesson completion     |
+| `DELETE` | `/courses/{courseSlug}/lessons/{lessonSlug}/complete`    | Unmark lesson completion     |
 | `GET`    | `/courses/{courseSlug}/lessons/{lessonSlug}/complete`    | Get lesson completion status |
 | `GET`    | `/courses/{courseSlug}/progress`                         | Get course progress          |
+
+### Quiz Scores
+
+| Method | Path                                                          | Description               |
+|--------|---------------------------------------------------------------|---------------------------|
+| `POST` | `/courses/{courseSlug}/lessons/{lessonSlug}/quiz-scores`      | Submit a quiz score       |
+| `GET`  | `/courses/{courseSlug}/lessons/{lessonSlug}/quiz-scores`      | Get quiz scores for lesson|
 
 > All endpoints (except those decorated with `@Public()`) require a valid Keycloak JWT Bearer token.
 
@@ -144,6 +148,7 @@ docker run -p 3000:3000 --env-file .env lms-be
 
 - [Keycloak Setup Guide](docs/keycloak-setup.md)
 - [Lesson Completion API](docs/lesson-completion-api.md)
+- [Quiz Score API](docs/quiz-score-api.md)
 
 ## License
 
