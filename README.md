@@ -75,6 +75,9 @@ DB_NAME=lms
 KEYCLOAK_BASE_URL=http://localhost:8080
 KEYCLOAK_REALM=lms
 KEYCLOAK_CLIENT_ID=lms-backend
+# Optional explicit OIDC endpoints (recommended in production)
+# KEYCLOAK_ISSUER_URL=http://localhost:8080/realms/lms
+# KEYCLOAK_JWKS_URI=http://localhost:8080/realms/lms/protocol/openid-connect/certs
 
 # Application
 PORT=3000

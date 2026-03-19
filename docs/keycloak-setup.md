@@ -94,6 +94,9 @@ Copy `.env.example` to `.env` and update the values:
 KEYCLOAK_BASE_URL=http://localhost:8080
 KEYCLOAK_REALM=lms
 KEYCLOAK_CLIENT_ID=lms-backend
+# Optional explicit OIDC endpoints (recommended for hosted deployments)
+# KEYCLOAK_ISSUER_URL=http://localhost:8080/realms/lms
+# KEYCLOAK_JWKS_URI=http://localhost:8080/realms/lms/protocol/openid-connect/certs
 
 # Application
 PORT=3000
@@ -104,6 +107,8 @@ PORT=3000
 | `KEYCLOAK_BASE_URL` | Base URL of your Keycloak server | `http://localhost:8080` |
 | `KEYCLOAK_REALM` | The Keycloak realm name | `lms` |
 | `KEYCLOAK_CLIENT_ID` | Client ID for the backend | `lms-backend` |
+| `KEYCLOAK_ISSUER_URL` | Explicit token issuer URL override | `` |
+| `KEYCLOAK_JWKS_URI` | Explicit JWKS endpoint override | `` |
 | `PORT` | Application port | `3000` |
 
 ---

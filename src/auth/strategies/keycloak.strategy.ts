@@ -13,10 +13,23 @@ export class KeycloakStrategy extends PassportStrategy(Strategy, 'keycloak') {
   private readonly logger = new Logger(KeycloakStrategy.name);
 
   constructor(private readonly configService: ConfigService) {
+    const bootstrapLogger = new Logger(KeycloakStrategy.name);
     const keycloakBaseUrl = configService.get<string>('keycloak.baseUrl');
     const keycloakRealm = configService.get<string>('keycloak.realm');
-    const jwksUri = `${keycloakBaseUrl}/realms/${keycloakRealm}/protocol/openid-connect/certs`;
-    const issuer = `${keycloakBaseUrl}/realms/${keycloakRealm}`;
+    const jwksUri = configService.get<string>('keycloak.jwksUri');
+    const issuer = configService.get<string>('keycloak.issuerUrl');
+
+    if (!jwksUri || !issuer) {
+      throw new Error(
+        'Keycloak configuration is incomplete. Please provide KEYCLOAK_BASE_URL/KEYCLOAK_REALM or explicit KEYCLOAK_ISSUER_URL and KEYCLOAK_JWKS_URI.',
+      );
+    }
+
+    if (keycloakBaseUrl?.includes('/realms/')) {
+      bootstrapLogger.warn(
+        'KEYCLOAK_BASE_URL appears to contain a realm path. Use only host base URL (e.g. https://sso.example.com) and set KEYCLOAK_REALM separately.',
+      );
+    }
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -31,6 +44,7 @@ export class KeycloakStrategy extends PassportStrategy(Strategy, 'keycloak') {
     });
 
     this.logger.log(`Keycloak JWT strategy initialized`);
+    this.logger.log(`Realm: ${keycloakRealm}`);
     this.logger.log(`JWKS URI: ${jwksUri}`);
     this.logger.log(`Issuer: ${issuer}`);
   }
