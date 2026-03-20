@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { ProgressModule } from './progress/progress.module';
 import { QuizScoresModule } from './quiz-scores/quiz-scores.module';
+import { SubmissionsModule } from './submissions/submissions.module';
 import keycloakConfig from './config/keycloak.config';
 
 @Module({
@@ -17,6 +18,7 @@ import keycloakConfig from './config/keycloak.config';
     AuthModule,
     ProgressModule,
     QuizScoresModule,
+    SubmissionsModule,
   ],
 })
 export class AppModule {}

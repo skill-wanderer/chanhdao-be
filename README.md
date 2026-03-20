@@ -20,6 +20,7 @@ Built with **NestJS**, **TypeORM**, **PostgreSQL**, and **Keycloak** for authent
 - **Role-Based Access Control** — `@Roles()` decorator backed by a global `RolesGuard` (supports realm and client roles)
 - **Lesson Completion Tracking** — Mark/unmark lessons as complete and query per-lesson or per-course progress
 - **Quiz Score Management** — Submit and retrieve quiz scores per lesson
+- **Public Submissions API** — Accept and store public form submissions in PostgreSQL (`jsonb`)
 - **Swagger UI** — Interactive API documentation with Bearer token support
 
 ## Project Structure
@@ -31,6 +32,7 @@ src/
 ├── database/           # TypeORM / PostgreSQL connection
 ├── progress/           # Lesson completion tracking
 ├── quiz-scores/        # Quiz score submission and retrieval
+├── submissions/        # Public submissions (contact type stored as jsonb)
 ├── app.module.ts       # Root module
 └── main.ts             # Application entry point
 ```
@@ -129,6 +131,12 @@ docker run -p 3000:3000 --env-file .env chanhdao-be
 | `POST` | `/courses/{courseSlug}/lessons/{lessonSlug}/quiz-scores`      | Submit a quiz score       |
 | `GET`  | `/courses/{courseSlug}/lessons/{lessonSlug}/quiz-scores`      | Get quiz scores for lesson|
 
+### Submissions
+
+| Method | Path             | Description                                         |
+|--------|------------------|-----------------------------------------------------|
+| `POST` | `/submissions`   | Submit public payload (`type` + `content` as jsonb)|
+
 > All endpoints (except those decorated with `@Public()`) require a valid Keycloak JWT Bearer token.
 
 ## Scripts
@@ -149,6 +157,7 @@ docker run -p 3000:3000 --env-file .env chanhdao-be
 - [Keycloak Setup Guide](docs/keycloak-setup.md)
 - [Lesson Completion API](docs/lesson-completion-api.md)
 - [Quiz Score API](docs/quiz-score-api.md)
+- [Submissions API](docs/submissions-api.md)
 
 ## License
 
