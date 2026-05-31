@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateSubmissionDto, SubmissionResponseDto } from './dto/submission.dto';
-import { Submission } from './entities/submission.entity';
+import { Submission, SubmissionType } from './entities/submission.entity';
 
 @Injectable()
 export class SubmissionsService {
@@ -24,11 +24,26 @@ export class SubmissionsService {
     const saved = await this.submissionsRepo.save(submission);
     this.logger.log(`Created ${saved.type} submission: ${saved.id}`);
 
+    return this.toResponseDto(saved);
+  }
+
+  async getSubmissionsByType(
+    type: SubmissionType,
+  ): Promise<SubmissionResponseDto[]> {
+    const submissions = await this.submissionsRepo.find({
+      where: { type },
+      order: { createdAt: 'DESC' },
+    });
+
+    return submissions.map((submission) => this.toResponseDto(submission));
+  }
+
+  private toResponseDto(submission: Submission): SubmissionResponseDto {
     return {
-      id: saved.id,
-      type: saved.type,
-      content: saved.content,
-      createdAt: saved.createdAt,
+      id: submission.id,
+      type: submission.type,
+      content: submission.content,
+      createdAt: submission.createdAt,
     };
   }
 }

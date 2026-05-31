@@ -10,8 +10,9 @@ For now, only `contact` type is supported.
 ## Overview
 
 - **Base URL:** `/api`
-- **Endpoint:** `POST /api/submissions`
-- **Authentication:** Public endpoint (`@Public()`), no bearer token required
+- **Create Endpoint:** `POST /api/submissions`
+- **Read Endpoint:** `GET /api/submissions/type/{type}`
+- **Authentication:** Create is public. Read requires a Keycloak bearer token.
 - **Database Table:** `submissions`
 - **Payload Column:** `content` (`jsonb`)
 
@@ -70,6 +71,47 @@ POST /api/submissions
 
 ---
 
+### Get Form Submissions By Type
+
+```
+GET /api/submissions/type/contact
+```
+
+### Request Headers
+
+| Header          | Value                    |
+|-----------------|--------------------------|
+| `Authorization` | `Bearer <access_token>`  |
+
+### Path Params
+
+| Param  | Type   | Required | Description                                      |
+|--------|--------|----------|--------------------------------------------------|
+| `type` | string | yes      | Submission category. Allowed values now: `contact` |
+
+### Success Response
+
+### `200 OK`
+
+```json
+[
+  {
+    "id": "d4a4a649-35b3-4f4c-92cb-26cdf8f17b6f",
+    "type": "contact",
+    "content": {
+      "name": "Jane Doe",
+      "email": "jane@example.com",
+      "message": "I want to know more about your courses."
+    },
+    "createdAt": "2026-03-20T09:00:00.000Z"
+  }
+]
+```
+
+The list is ordered newest first.
+
+---
+
 ## Error Responses
 
 ### `400 Bad Request`
@@ -77,6 +119,7 @@ POST /api/submissions
 Returned when input is invalid:
 - `type` missing or not allowed by enum
 - `content` missing or not an object
+- path `type` is not allowed by enum
 
 Example:
 

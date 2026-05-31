@@ -136,6 +136,7 @@ docker run -p 3000:3000 --env-file .env chanhdao-be
 | Method | Path             | Description                                         |
 |--------|------------------|-----------------------------------------------------|
 | `POST` | `/submissions`   | Submit public payload (`type` + `content` as jsonb)|
+| `GET`  | `/submissions/type/{type}` | Get all form submissions by type          |
 
 > All endpoints (except those decorated with `@Public()`) require a valid Keycloak JWT Bearer token.
 
