@@ -7,6 +7,7 @@ import {
 
 export enum SubmissionType {
   CONTACT = 'contact',
+  FEEDBACK = 'feedback',
 }
 
 @Entity('submissions')
